@@ -1,3 +1,3 @@
-import {log} from './log.js'
+import { log } from "./log.js";
 
-log('1234')
+log("1234");
