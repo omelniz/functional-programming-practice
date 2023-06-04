@@ -1,3 +1,3 @@
-import { log } from "./log.js";
+import { toUpperCase } from "./log.js";
 
-log("1234");
+console.log(toUpperCase("sdfdsf"));

@@ -1,3 +1,1 @@
-export const log = (str: string) => {
-	console.log(str);
-};
+export const toUpperCase = (str: string) => str.toUpperCase();
