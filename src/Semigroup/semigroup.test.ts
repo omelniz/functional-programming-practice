@@ -92,30 +92,31 @@ describe("Examples of Magma that are not Semigroup", () => {
 describe("concat all", () => {
 	const concatAll =
 		<A>(s: Semigroup<A>) =>
-		(xs: Array<A>, defaultValue: A): A => {
+		(defaultValue: A) =>
+		(xs: Array<A>): A => {
 			const [head, ...tail] = xs;
 
 			if (!head) return defaultValue;
 
 			return tail.length === 0
 				? head
-				: s.concat(head, concatAll(s)(tail, defaultValue));
+				: s.concat(head, concatAll(s)(defaultValue)(tail));
 		};
 
 	it("concat all with addSemigroup", () => {
 		const addSemigroup: Semigroup<number> = { concat: (a, b) => a + b };
 
-		expect(concatAll(addSemigroup)([1, 2, 3], 0)).toEqual(6);
-		expect(concatAll(addSemigroup)([3, 6, 1], 0)).toEqual(10);
-		expect(concatAll(addSemigroup)([], 0)).toEqual(0);
+		expect(concatAll(addSemigroup)(0)([1, 2, 3])).toEqual(6);
+		expect(concatAll(addSemigroup)(0)([3, 6, 1])).toEqual(10);
+		expect(concatAll(addSemigroup)(0)([])).toEqual(0);
 	});
 
 	it("concat all with multiplySemigroup", () => {
 		const multiplySemigroup: Semigroup<number> = { concat: (a, b) => a * b };
 
-		expect(concatAll(multiplySemigroup)([1, 2, 3], 1)).toEqual(6);
-		expect(concatAll(multiplySemigroup)([3, 6, 1], 1)).toEqual(18);
-		expect(concatAll(multiplySemigroup)([], 1)).toEqual(1);
+		expect(concatAll(multiplySemigroup)(1)([1, 2, 3])).toEqual(6);
+		expect(concatAll(multiplySemigroup)(1)([3, 6, 1])).toEqual(18);
+		expect(concatAll(multiplySemigroup)(1)([])).toEqual(1);
 	});
 
 	it("concat all with appendSemigroup", () => {
@@ -123,9 +124,9 @@ describe("concat all", () => {
 			concat: (a, b) => a.concat(b),
 		};
 
-		expect(concatAll(appendSemigroup)(["Hello", " ", "world"], "")).toEqual(
+		expect(concatAll(appendSemigroup)("")(["Hello", " ", "world"])).toEqual(
 			"Hello world",
 		);
-		expect(concatAll(appendSemigroup)([], "")).toEqual("");
+		expect(concatAll(appendSemigroup)("")([])).toEqual("");
 	});
 });
