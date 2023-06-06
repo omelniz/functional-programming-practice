@@ -1,6 +1,12 @@
 import { expect, it, describe } from "vitest";
 import { Magma } from "../Magma/index.js";
-import { Semigroup } from "./index.js";
+import {
+	Semigroup,
+	addSemigroup,
+	multiplySemigroup,
+	appendSemigroup,
+	concatAll,
+} from "./index.js";
 
 describe("Examples of Semigroup", () => {
 	/**
@@ -9,11 +15,7 @@ describe("Examples of Semigroup", () => {
 	 **/
 
 	it("numbers with addition", () => {
-		const m: Semigroup<number> = {
-			concat(a, b) {
-				return a + b;
-			},
-		};
+		const m = addSemigroup;
 
 		expect(m.concat(1, 2)).toBe(3);
 		expect(m.concat(2, 3)).toBe(5);
@@ -21,11 +23,7 @@ describe("Examples of Semigroup", () => {
 	});
 
 	it("numbers with multiplication", () => {
-		const m: Semigroup<number> = {
-			concat(a, b) {
-				return a * b;
-			},
-		};
+		const m = multiplySemigroup;
 
 		expect(m.concat(1, 2)).toBe(2);
 		expect(m.concat(2, 3)).toBe(6);
@@ -46,11 +44,7 @@ describe("Examples of Semigroup", () => {
 	});
 
 	it("strings with contatenation", () => {
-		const m: Semigroup<string> = {
-			concat(a, b) {
-				return a.concat(b);
-			},
-		};
+		const m = appendSemigroup;
 
 		expect(m.concat("Hello ", "world")).toEqual("Hello world");
 		expect(m.concat("a", m.concat("b", "c"))).toEqual(
@@ -90,40 +84,19 @@ describe("Examples of Magma that are not Semigroup", () => {
 });
 
 describe("concat all", () => {
-	const concatAll =
-		<A>(s: Semigroup<A>) =>
-		(defaultValue: A) =>
-		(xs: Array<A>): A => {
-			const [head, ...tail] = xs;
-
-			if (!head) return defaultValue;
-
-			return tail.length === 0
-				? head
-				: s.concat(head, concatAll(s)(defaultValue)(tail));
-		};
-
 	it("concat all with addSemigroup", () => {
-		const addSemigroup: Semigroup<number> = { concat: (a, b) => a + b };
-
 		expect(concatAll(addSemigroup)(0)([1, 2, 3])).toEqual(6);
 		expect(concatAll(addSemigroup)(0)([3, 6, 1])).toEqual(10);
 		expect(concatAll(addSemigroup)(0)([])).toEqual(0);
 	});
 
 	it("concat all with multiplySemigroup", () => {
-		const multiplySemigroup: Semigroup<number> = { concat: (a, b) => a * b };
-
 		expect(concatAll(multiplySemigroup)(1)([1, 2, 3])).toEqual(6);
 		expect(concatAll(multiplySemigroup)(1)([3, 6, 1])).toEqual(18);
 		expect(concatAll(multiplySemigroup)(1)([])).toEqual(1);
 	});
 
 	it("concat all with appendSemigroup", () => {
-		const appendSemigroup: Semigroup<string> = {
-			concat: (a, b) => a.concat(b),
-		};
-
 		expect(concatAll(appendSemigroup)("")(["Hello", " ", "world"])).toEqual(
 			"Hello world",
 		);
